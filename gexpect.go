@@ -207,6 +207,42 @@ func (expect *ExpectSubprocess) Interact() {
 	go io.Copy(expect.f, os.Stdin)
 }
 
+func (expect *ExpectSubprocess) ExpectRead(searchString string) (join []byte, e error) {
+	join = make([]byte, 1, 512)
+	chunk := make([]byte, len(searchString)*2)
+	target := len(searchString)
+	m := 0
+	i := 0
+	// Build KMP Table
+	table := buildKMPTable(searchString)
+
+	for {
+		n, err := expect.f.Read(chunk)
+
+		if err != nil {
+			return nil, err
+		}
+		offset := m + i
+		for m+i-offset < n {
+			join = append(join, chunk[m+i-offset])
+
+			if searchString[i] == chunk[m+i-offset] {
+				i += 1
+				if i == target {
+					return join,nil
+				}
+			} else {
+				m += i - table[i]
+				if table[i] > -1 {
+					i = table[i]
+				} else {
+					i = 0
+				}
+			}
+		}
+	}
+}
+
 func (expect *ExpectSubprocess) ReadUntil(delim byte) ([]byte, error) {
 	join := make([]byte, 1, 512)
 	chunk := make([]byte, 255)

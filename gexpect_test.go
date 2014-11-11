@@ -8,7 +8,7 @@ import (
 
 func TestHelloWorld(*testing.T) {
 	log.Printf("Testing Hello World... ")
-	child, err := Spawn("echo \"Hello World\"")
+	child, err := Spawn("echo \"Bla bla bla blu Hello World\"")
 	if err != nil {
 		panic(err)
 	}
@@ -17,6 +17,23 @@ func TestHelloWorld(*testing.T) {
 		panic(err)
 	}
 	log.Printf("Success\n")
+}
+
+func TestHelloWorldExpectRead(*testing.T) {
+	log.Printf("Testing Hello World Read Expect... ")
+	child, err := Spawn("echo \"Bla bla asdfa afdsadfa Hello World\"")
+	if err != nil {
+		panic(err)
+	}
+	payload, err := child.ExpectRead("Hello World")
+	if err != nil {
+		panic(err)
+	}
+	if !strings.Contains(string(payload),"Bla bla asdfa afdsadfa Hello World") {
+		panic("Payload doesn't match")
+	}
+
+	log.Printf("Success reading expectation [%s]\n", payload)
 }
 
 func TestHelloWorldFailureCase(*testing.T) {

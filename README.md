@@ -25,6 +25,8 @@ It also provides interface functions that make it much simpler to work with subp
 
 	child.ReadUntil(' ') // ReadUntil(delim byte) ([]byte, error)
 
+	child.ExpectRead(">>>") // ExpectRead(searchString string) (join []byte, e error)
+
 	child.SendLine("/bin/sh -c 'echo Hello World | tee foo'") //  SendLine(command string) (error)
 
 	child.Wait() // Wait() (error)
