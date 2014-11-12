@@ -207,6 +207,24 @@ func (expect *ExpectSubprocess) Interact() {
 	go io.Copy(expect.f, os.Stdin)
 }
 
+func (expect *ExpectSubprocess) ExpectReadTimeout(searchString string, timeout time.Duration) (join []byte, e error) {
+	var join []byte
+	result := make(chan []byte)
+	go func() {
+		join, _ = expect.ExpectRead(searchString)
+		result <- join
+	}()
+	e = nil
+	select {
+	case join = <-result:
+	case <-time.After(timeout):
+		e = errors.New("Expect timed out.")
+	}
+	return join,e
+}
+
+
+
 func (expect *ExpectSubprocess) ExpectRead(searchString string) (join []byte, e error) {
 	join = make([]byte, 1, 512)
 	chunk := make([]byte, len(searchString)*2)
