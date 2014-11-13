@@ -208,7 +208,7 @@ func (expect *ExpectSubprocess) Interact() {
 }
 
 func (expect *ExpectSubprocess) ExpectReadTimeout(searchString string, timeout time.Duration) (join []byte, e error) {
-	var join []byte
+	
 	result := make(chan []byte)
 	go func() {
 		join, _ = expect.ExpectRead(searchString)
